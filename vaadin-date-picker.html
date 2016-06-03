@@ -68,6 +68,10 @@ See paper-input-container documentation for styling the included input fields
         display: block;
       }
 
+      #dropdown:not([fullscreen]) {
+        padding: 12px 0 10px 0;
+      }
+
       #overlay {
         height: 100vh;
         width: 420px;
@@ -189,6 +193,10 @@ See paper-input-container documentation for styling the included input fields
 
       properties: {
 
+        minDate:{
+          type:Date
+        },
+
         /**
          * The current selected date.
          */
@@ -292,13 +300,13 @@ See paper-input-container documentation for styling the included input fields
           value: function() {
             return {
               monthNames: [
-                'January', 'February', 'March', 'April', 'May',
-                'June', 'July', 'August', 'September', 'October', 'November', 'December'
+                'Janvier', 'Février ', 'Mars ', 'Avril ', 'Mai ',
+                'Juin ', 'Juillet ', 'Août ', 'Septembre', 'Octobre', 'Novembre', 'Decembre'
               ],
-              weekdaysShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+              weekdaysShort: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
               firstDayOfWeek: 0,
-              today: 'Today',
-              cancel: 'Cancel',
+              today: 'Aujourd\'hui',
+              cancel: 'Annuler',
               formatDate: function(d) {
                 return (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
               },
@@ -407,6 +415,7 @@ See paper-input-container documentation for styling the included input fields
 
       _updateAlignmentAndPosition: function() {
         var viewportWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+        this.$.dropdown.verticalOffset = this._fullscreen ? 0 : this.clientHeight - 10;
         this.$.dropdown.positionTarget = this._fullscreen ? document.documentElement : this;
 
         var viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
@@ -415,16 +424,6 @@ See paper-input-container documentation for styling the included input fields
 
         this.$.dropdown.verticalAlign = bottomAlign ? 'bottom' : 'top';
         this.$.dropdown.horizontalAlign = this._fullscreen ? null : rightAlign ? 'right' : 'left';
-
-        // Previously used verticalOffset property has been recently deprecated
-        // in favor of using top and bottom margins.
-        if (this._fullscreen) {
-          this.$.dropdown.style.marginTop = 0;
-          this.$.dropdown.style.marginBottom = 0;
-        } else {
-          this.$.dropdown.style.marginTop = (bottomAlign ? 10 : this.clientHeight + 2) + 'px';
-          this.$.dropdown.style.marginBottom = (bottomAlign ? this.clientHeight : 10) + 'px';
-        }
 
         this.$.dropdown.refit();
       },
@@ -509,8 +508,7 @@ See paper-input-container documentation for styling the included input fields
       },
 
       _preventCancelOnComponentAccess: function(e) {
-        var event = Polymer.dom(e.detail);
-        if (/tap|mousedown|touchstart/.test(e.detail.type) && event.path.indexOf(this) > -1) {
+        if (/tap|mousedown|touchstart/.test(e.detail.type) && this.contains(e.detail.target)) {
           e.preventDefault();
         }
       },
